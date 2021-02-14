@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>Hello Electron React!</title>
@@ -35,7 +35,7 @@
       if (scripts.length) {
         document.write(
           scripts
-            .map((script) => `<script defer src="${script}"><\/script>`)
+            .map((script) => `<script defer src='${script}'><\/script>`)
             .join('')
         );
       }
