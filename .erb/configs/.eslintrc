@@ -1,6 +1,6 @@
 {
   "rules": {
-    "no-console": "off",
+    "no-console": "error",
     "global-require": "off",
     "import/no-dynamic-require": "off"
   }
