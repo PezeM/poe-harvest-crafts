@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Layout, Menu } from 'antd';
-import { UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
+import { UploadOutlined, UserOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '../constants/routes';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -21,30 +23,16 @@ export const BaseLayout: React.FC<Props> = ({ children }) => {
         onCollapse={() => setSiderCollapsed(!siderCollapsed)}
       >
         <div className='logo' />
-        <Menu theme='dark' mode='inline' defaultSelectedKeys={['4']}>
-          <Menu.Item key='1' icon={<UserOutlined />}>
-            nav 1
+        <Menu theme='dark' mode='inline' defaultSelectedKeys={[ROUTES.MAIN]}>
+          <Menu.Item key={ROUTES.MAIN} icon={<UserOutlined />}>
+            <Link to={ROUTES.MAIN}>
+              Main page
+            </Link>
           </Menu.Item>
-          <Menu.Item key='2' icon={<VideoCameraOutlined />}>
-            nav 2
-          </Menu.Item>
-          <Menu.Item key='3' icon={<UploadOutlined />}>
-            nav 3
-          </Menu.Item>
-          <Menu.Item key='4' icon={<UploadOutlined />}>
-            nav 4
-          </Menu.Item>
-          <Menu.Item key='5' icon={<UploadOutlined />}>
-            nav 5
-          </Menu.Item>
-          <Menu.Item key='6' icon={<UploadOutlined />}>
-            nav 6
-          </Menu.Item>
-          <Menu.Item key='7' icon={<UploadOutlined />}>
-            nav 7
-          </Menu.Item>
-          <Menu.Item key='8' icon={<UploadOutlined />}>
-            nav 8
+          <Menu.Item key={ROUTES.SETTINGS} icon={<UploadOutlined />}>
+            <Link to={ROUTES.SETTINGS}>
+              Settings
+            </Link>
           </Menu.Item>
         </Menu>
       </Sider>
