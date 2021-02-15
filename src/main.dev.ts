@@ -15,6 +15,7 @@ import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
+import './constants/config';
 
 export default class AppUpdater {
   constructor() {
@@ -73,8 +74,8 @@ const createWindow = async () => {
     height: 728,
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      nodeIntegration: true,
-    },
+      nodeIntegration: true
+    }
   });
 
   mainWindow.loadURL(`file://${__dirname}/index.html`);

@@ -5,13 +5,15 @@ import './App.global.css';
 import { BaseLayout } from './containers/baseLayout';
 import { ROUTES } from './constants/routes';
 import { Error404 } from './components/error404';
+import { config } from './constants/config';
 
 const Hello = () => {
   return (
     <div>
       <DatePicker />
-      <Button type='primary' style={{ marginLeft: 8 }}>
+      <Button type='primary' style={{ marginLeft: 8 }} onClick={() => config.set('logLevel', '312321')}>
         Primary Button
+        {config.get('logLevel')}
       </Button>
     </div>
   );
