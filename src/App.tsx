@@ -4,6 +4,7 @@ import { Button, DatePicker } from 'antd';
 import './App.global.css';
 import { BaseLayout } from './containers/baseLayout';
 import { ROUTES } from './constants/routes';
+import { Error404 } from './components/error404';
 
 const Hello = () => {
   return (
@@ -31,6 +32,7 @@ export default function App() {
         <Switch>
           <Route path={ROUTES.MAIN} exact component={Hello} />
           <Route path={ROUTES.SETTINGS} component={Settings} />
+          <Route path='*' component={Error404} />
         </Switch>
       </BaseLayout>
     </Router>

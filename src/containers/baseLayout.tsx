@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Layout, Menu } from 'antd';
 import { UploadOutlined, UserOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -12,6 +12,7 @@ interface Props {
 
 export const BaseLayout: React.FC<Props> = ({ children }) => {
   const [siderCollapsed, setSiderCollapsed] = useState(false);
+  const location = useLocation();
 
   return (
     <Layout style={{
@@ -23,7 +24,7 @@ export const BaseLayout: React.FC<Props> = ({ children }) => {
         onCollapse={() => setSiderCollapsed(!siderCollapsed)}
       >
         <div className='logo' />
-        <Menu theme='dark' mode='inline' defaultSelectedKeys={[ROUTES.MAIN]}>
+        <Menu theme='dark' mode='inline' selectedKeys={[location.pathname]}>
           <Menu.Item key={ROUTES.MAIN} icon={<UserOutlined />}>
             <Link to={ROUTES.MAIN}>
               Main page
