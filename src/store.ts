@@ -1,11 +1,15 @@
+import * as Sentry from '@sentry/react';
 import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
 import createRootReducer from './rootReducer';
 
 const rootReducer = createRootReducer();
 
+const sentryReduxEnhancer = Sentry.createReduxEnhancer({});
+
 export const configuredStore = () => {
   const store = configureStore({
-    reducer: rootReducer
+    reducer: rootReducer,
+    enhancers: [sentryReduxEnhancer]
   });
 
   if (process.env.NODE_ENV === 'development' && module.hot) {
