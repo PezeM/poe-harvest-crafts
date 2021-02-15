@@ -16,6 +16,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import './constants/config';
+import { initializeConfigEvents } from './constants/config';
 
 export default class AppUpdater {
   constructor() {
@@ -69,10 +70,10 @@ const createWindow = async () => {
   };
 
   mainWindow = new BrowserWindow({
-    show: false,
-    width: 1024,
-    height: 728,
+    width: 1280,
+    height: 720,
     icon: getAssetPath('icon.png'),
+    center: true,
     webPreferences: {
       nodeIntegration: true
     }
@@ -110,6 +111,8 @@ const createWindow = async () => {
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
+
+  initializeConfigEvents();
 };
 
 /**

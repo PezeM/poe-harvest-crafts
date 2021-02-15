@@ -4,3 +4,6 @@ export interface Config {
   logLevel: string;
   language?: string;
 }
+
+export type ConfigKeys = keyof Config;
+export type ConfigValue = Config[ConfigKeys];
