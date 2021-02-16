@@ -1,3 +1,7 @@
+export interface AppConfig {
+  poeWindowName: string;
+}
+
 export interface Config {
   leagueId?: string;
   clientLog?: string;

@@ -4,6 +4,7 @@ import { Button, DatePicker } from 'antd';
 import React from 'react';
 import { mainProcess } from '../features/ipc/mainProcess';
 import { desktopCapturer, SourcesOptions } from 'electron';
+import appConfig from '../constants/appConfig';
 
 export const Hello = () => {
   const dispatch = useDispatch();
@@ -25,6 +26,8 @@ export const Hello = () => {
       const sources = await desktopCapturer.getSources(options);
       for (const source of sources) {
         console.log(source);
+
+        if (source.name !== appConfig.poeWindowName) continue;
 
         // const screenshotPath = path.join(os.tmpdir(), `${source.name}.png`);
         // console.log(screenshotPath);
