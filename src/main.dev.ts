@@ -11,12 +11,13 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, screen, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import './constants/config';
 import { initializeConfigEvents } from './constants/config';
+import { IPC_EVENTS } from './constants/ipc/events';
 
 export default class AppUpdater {
   constructor() {
@@ -75,7 +76,8 @@ const createWindow = async () => {
     icon: getAssetPath('icon.png'),
     center: true,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      enableRemoteModule: true
     }
   });
 
@@ -113,6 +115,10 @@ const createWindow = async () => {
   new AppUpdater();
 
   initializeConfigEvents();
+
+  ipcMain.on(IPC_EVENTS.GET_SCREEN_DIMENSION, e => {
+    e.returnValue = screen.getPrimaryDisplay().workAreaSize;
+  });
 };
 
 /**

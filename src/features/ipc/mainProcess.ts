@@ -2,6 +2,7 @@ import { Config } from '../../types/config.interface';
 import { defaultConfig } from '../../constants/config';
 import { Renderer } from 'electron';
 import { IPC_EVENTS } from '../../constants/ipc/events';
+import { ScreenSizeInterface } from '../../types/screen.interface';
 
 let electron: typeof Renderer | undefined;
 try {
@@ -26,6 +27,10 @@ class MainProcess extends EventTarget {
     if (electron) {
       electron.ipcRenderer.send(IPC_EVENTS.UPDATE_CONFIG, JSON.parse(JSON.stringify(config)));
     }
+  }
+
+  getScreenDimension(): ScreenSizeInterface {
+    return electron ? electron.ipcRenderer.sendSync(IPC_EVENTS.GET_SCREEN_DIMENSION) : { width: 1920, height: 1080 };
   }
 }
 

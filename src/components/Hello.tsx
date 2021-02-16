@@ -2,10 +2,42 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectConfig, updateKey } from '../features/config/configSlice';
 import { Button, DatePicker } from 'antd';
 import React from 'react';
+import { mainProcess } from '../features/ipc/mainProcess';
+import { desktopCapturer, SourcesOptions } from 'electron';
 
 export const Hello = () => {
   const dispatch = useDispatch();
   const config = useSelector(selectConfig);
+
+  const takeScreenshot = async () => {
+    console.log('Taking screenshot');
+
+    const size = mainProcess.getScreenDimension();
+    console.log(size);
+
+
+    const options: SourcesOptions = {
+      thumbnailSize: size,
+      types: ['window']
+    };
+
+    try {
+      const sources = await desktopCapturer.getSources(options);
+      for (const source of sources) {
+        console.log(source);
+
+        // const screenshotPath = path.join(os.tmpdir(), `${source.name}.png`);
+        // console.log(screenshotPath);
+        //
+        // fs.writeFile(screenshotPath, source.thumbnail.toPNG(), err => {
+        //   console.log(err);
+        //   console.log('Saved file');
+        // });
+      }
+    } catch (e) {
+      console.error('Error in capturing image', e);
+    }
+  };
 
   return (
     <div>
@@ -18,6 +50,9 @@ export const Hello = () => {
       <div>
         co: {config.clientLog}
       </div>
+      <Button type='primary' onClick={takeScreenshot}>
+        Zrob se screena
+      </Button>
     </div>
   );
 };
