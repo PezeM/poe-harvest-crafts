@@ -58,10 +58,9 @@ export const Hello = () => {
     const size = mainProcess.getScreenDimension();
     console.log(size);
 
-
     const options: SourcesOptions = {
       thumbnailSize: size,
-      types: ['window']
+      types: ['window', 'screen']
     };
 
     try {
@@ -99,6 +98,12 @@ export const Hello = () => {
         Zrob se screena
       </Button>
       <Canvas width={1920} height={1080} />
+      <Button type='primary' onClick={() => {
+        const result = mainProcess.showOverlayWindow();
+        console.log('window shown', result);
+      }}>
+        Open overlay
+      </Button>
     </div>
   );
 };

@@ -32,6 +32,15 @@ class MainProcess extends EventTarget {
   getScreenDimension(): ScreenSizeInterface {
     return electron ? electron.ipcRenderer.sendSync(IPC_EVENTS.GET_SCREEN_DIMENSION) : { width: 1920, height: 1080 };
   }
+
+  showOverlayWindow(): boolean {
+    if (electron) {
+      electron.ipcRenderer.send(IPC_EVENTS.SHOW_OVERLAY);
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
 
 export const mainProcess = new MainProcess();

@@ -19,6 +19,7 @@ import './constants/config';
 import { initializeConfigEvents } from './constants/config';
 import { IPC_EVENTS } from './constants/ipc/events';
 import { TrayMenu } from './tray';
+import './features/overlay';
 
 export default class AppUpdater {
   constructor() {
@@ -137,8 +138,6 @@ const createWindow = async () => {
   ipcMain.on(IPC_EVENTS.GET_SCREEN_DIMENSION, e => {
     e.returnValue = screen.getPrimaryDisplay().workAreaSize;
   });
-
-  createSecondWindow(getAssetPath('icon.png'));
 };
 
 /**
@@ -160,28 +159,3 @@ app.on('activate', () => {
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) createWindow();
 });
-
-
-function createSecondWindow(icon: string) {
-  // setTimeout(() => {
-  //   const secondWindow = new BrowserWindow({
-  //     width: 1280,
-  //     height: 720,
-  //     icon: icon,
-  //     frame: false,
-  //     transparent: true,
-  //     autoHideMenuBar: true,
-  //     webPreferences: {
-  //       nodeIntegration: true,
-  //       enableRemoteModule: true
-  //     }
-  //   });
-  //
-  //   secondWindow.loadURL(`file://${__dirname}/index.html#/overlay`);
-  //
-  //   secondWindow.once('ready-to-show', () => {
-  //     console.log('Showing window');
-  //     secondWindow.show();
-  //   });
-  // }, 5000);
-}
