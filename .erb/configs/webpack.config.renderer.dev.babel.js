@@ -3,7 +3,7 @@ import fs from 'fs';
 import webpack from 'webpack';
 import chalk from 'chalk';
 import { merge } from 'webpack-merge';
-import { spawn, execSync } from 'child_process';
+import { execSync, spawn } from 'child_process';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from '../scripts/CheckNodeEnv';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
@@ -264,7 +264,7 @@ export default merge(baseConfig, {
     watchOptions: {
       aggregateTimeout: 300,
       ignored: /node_modules/,
-      poll: 100,
+      poll: 250
     },
     historyApiFallback: {
       verbose: true,

@@ -8,6 +8,6 @@ const store = configuredStore();
 
 render(
   <Provider store={store}>
-    <App />,
+    <App />
   </Provider>,
   document.getElementById('root'));

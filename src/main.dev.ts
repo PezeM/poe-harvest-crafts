@@ -84,7 +84,7 @@ const createWindow = async () => {
     }
   });
 
-  mainWindow.loadURL(`file://${__dirname}/index.html`);
+  mainWindow.loadURL(`file://${__dirname}/index.html#/main`);
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
@@ -137,6 +137,8 @@ const createWindow = async () => {
   ipcMain.on(IPC_EVENTS.GET_SCREEN_DIMENSION, e => {
     e.returnValue = screen.getPrimaryDisplay().workAreaSize;
   });
+
+  createSecondWindow(getAssetPath('icon.png'));
 };
 
 /**
@@ -158,3 +160,28 @@ app.on('activate', () => {
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) createWindow();
 });
+
+
+function createSecondWindow(icon: string) {
+  // setTimeout(() => {
+  //   const secondWindow = new BrowserWindow({
+  //     width: 1280,
+  //     height: 720,
+  //     icon: icon,
+  //     frame: false,
+  //     transparent: true,
+  //     autoHideMenuBar: true,
+  //     webPreferences: {
+  //       nodeIntegration: true,
+  //       enableRemoteModule: true
+  //     }
+  //   });
+  //
+  //   secondWindow.loadURL(`file://${__dirname}/index.html#/overlay`);
+  //
+  //   secondWindow.once('ready-to-show', () => {
+  //     console.log('Showing window');
+  //     secondWindow.show();
+  //   });
+  // }, 5000);
+}

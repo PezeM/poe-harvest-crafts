@@ -1,6 +1,8 @@
 export type RoutesType = typeof ROUTES;
 
 export const ROUTES = {
-  MAIN: '/',
-  SETTINGS: '/settings'
+  MAIN: '/main',
+  SETTINGS: '/main/settings',
+
+  OVERLAY: '/overlay'
 };
