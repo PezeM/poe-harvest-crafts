@@ -1,5 +1,6 @@
 export interface AppConfig {
   poeWindowName: string;
+  dataFolderName: string;
 }
 
 export interface Config {

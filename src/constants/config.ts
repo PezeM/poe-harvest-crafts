@@ -2,6 +2,7 @@ import Store from 'electron-store';
 import { Config } from '../types/config.interface';
 import { ipcMain } from 'electron';
 import { IPC_EVENTS } from './ipc/events';
+import appConfig from './appConfig';
 
 export const defaultConfig: Config = {
   logLevel: '2',
@@ -22,7 +23,7 @@ export const initializeConfigEvents = (): void => {
 export const config = (() => {
   const store = new Store<Config>({
     name: 'config',
-    cwd: 'data',
+    cwd: appConfig.dataFolderName,
     defaults: defaultConfig
   });
 
