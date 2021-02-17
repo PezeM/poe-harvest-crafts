@@ -9,6 +9,10 @@ export const Error404 = () => {
       status='404'
       title='404'
       subTitle='Sorry, the page you visited does not exist.'
+      style={{
+        width: '100%',
+        height: '100%'
+      }}
       extra={
         <ButtonAntd to={ROUTES.MAIN} type='danger'>Back Main Page</ButtonAntd>
       }
