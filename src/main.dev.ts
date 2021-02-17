@@ -18,6 +18,7 @@ import MenuBuilder from './menu';
 import './constants/config';
 import { initializeConfigEvents } from './constants/config';
 import { IPC_EVENTS } from './constants/ipc/events';
+import { TrayMenu } from './tray';
 
 export default class AppUpdater {
   constructor() {
@@ -70,6 +71,8 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
+  console.log('Here');
+
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 720,
@@ -89,6 +92,7 @@ const createWindow = async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
+
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {
@@ -97,18 +101,32 @@ const createWindow = async () => {
     }
   });
 
+  const menuBuilder = new MenuBuilder(mainWindow);
+  menuBuilder.buildMenu();
+
+  const trayMenu = new TrayMenu(mainWindow, getAssetPath('icon.png'));
+  trayMenu.buildMenu();
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
+  mainWindow.on('close', (e) => {
+    e.preventDefault();
+    mainWindow?.hide();
+  });
+
+  mainWindow.on('minimize', (e: Event) => {
+    e.preventDefault();
+    mainWindow?.hide();
+  });
 
   // Open urls in the user's browser
   mainWindow.webContents.on('new-window', (event, url) => {
     event.preventDefault();
     shell.openExternal(url);
   });
+
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line

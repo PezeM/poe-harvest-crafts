@@ -1,10 +1,52 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { selectConfig, updateKey } from '../features/config/configSlice';
 import { Button, DatePicker } from 'antd';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { mainProcess } from '../features/ipc/mainProcess';
 import { desktopCapturer, SourcesOptions } from 'electron';
 import appConfig from '../constants/appConfig';
+
+interface CanvasProps {
+  width: number;
+  height: number;
+
+  [propName: string]: any;
+}
+
+const Canvas: React.FC<CanvasProps> = ({
+                                         width,
+                                         height,
+                                         ...props
+                                       }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+    context.fillStyle = '#333333';
+    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+  }, []);
+
+  const draw = (ctx: CanvasRenderingContext2D) => {
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.arc(50, 100, 20, 0, 2 * Math.PI);
+    ctx.fill();
+  };
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+    // Our draw come here
+    draw(context);
+  }, [draw]);
+
+  return <canvas ref={canvasRef} {...props} />;
+};
 
 export const Hello = () => {
   const dispatch = useDispatch();
@@ -56,6 +98,7 @@ export const Hello = () => {
       <Button type='primary' onClick={takeScreenshot}>
         Zrob se screena
       </Button>
+      <Canvas width={1920} height={1080} />
     </div>
   );
 };
