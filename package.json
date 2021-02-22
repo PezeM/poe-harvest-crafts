@@ -1,7 +1,7 @@
 {
   "name": "poe-harvest-crafts",
   "version": "0.0.1",
-  "description": "",
+  "description": "Tool for getting path of exile harvest informations",
   "scripts": {
     "build": "concurrently \"yarn build:main\" \"yarn build:renderer\"",
     "build:main": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.main.prod.babel.js",
@@ -227,8 +227,10 @@
     "antd": "^4.12.3",
     "electron-debug": "^3.1.0",
     "electron-log": "^4.2.4",
+    "electron-overlay-window": "git://github.com/OhMyGuus/electron-overlay-window",
     "electron-store": "^7.0.2",
     "electron-updater": "^4.3.4",
+    "electron-window-state": "^5.0.3",
     "history": "^5.0.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

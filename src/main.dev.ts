@@ -11,15 +11,16 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, ipcMain, screen, shell } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
+import windowStateKeeper from 'electron-window-state';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import './constants/config';
 import { initializeConfigEvents } from './constants/config';
-import { IPC_EVENTS } from './constants/ipc/events';
 import { TrayMenu } from './tray';
 import './features/overlay';
+import { initializeIpcListeners } from './features/ipc/ipcListeners';
 
 export default class AppUpdater {
   constructor() {
@@ -87,19 +88,22 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
-  console.log('Here');
+  const mainWindowState = windowStateKeeper({});
 
   mainWindow = new BrowserWindow({
+    title: 'Poe-harvest-crafts',
     width: 1280,
     height: 720,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
     icon: getAssetPath('icon.png'),
-    center: true,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true
     }
   });
 
+  mainWindowState.manage(mainWindow);
   mainWindow.loadURL(`file://${__dirname}/index.html#/main`);
 
   // @TODO: Use 'ready-to-show' event
@@ -143,21 +147,12 @@ const createWindow = async () => {
     shell.openExternal(url);
   });
 
-
   // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
   new AppUpdater();
 
   initializeConfigEvents();
-
-  ipcMain.on(IPC_EVENTS.GET_SCREEN_DIMENSION, e => {
-    e.returnValue = screen.getPrimaryDisplay().workAreaSize;
-  });
+  initializeIpcListeners(mainWindow);
 };
-
-/**
- * Add event listeners...
- */
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
@@ -167,7 +162,7 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.whenReady().then(createWindow).catch(console.log);
+app.whenReady().then(createWindow).catch(console.error);
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the

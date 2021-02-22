@@ -99,10 +99,14 @@ export const Hello = () => {
       </Button>
       <Canvas width={1920} height={1080} />
       <Button type='primary' onClick={() => {
-        const result = mainProcess.showOverlayWindow();
-        console.log('window shown', result);
+        mainProcess.showOverlayWindow();
       }}>
         Open overlay
+      </Button>
+      <Button type='primary' onClick={() => {
+        mainProcess.closeOverlayWindow();
+      }}>
+        Close overlay
       </Button>
     </div>
   );

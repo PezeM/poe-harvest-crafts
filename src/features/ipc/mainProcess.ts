@@ -41,6 +41,12 @@ class MainProcess extends EventTarget {
       return false;
     }
   }
+
+  closeOverlayWindow() {
+    if (electron) {
+      electron.ipcRenderer.send(IPC_EVENTS.CLOSE_OVERLAY);
+    }
+  }
 }
 
 export const mainProcess = new MainProcess();

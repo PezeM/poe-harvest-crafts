@@ -1,7 +1,7 @@
 {
   "name": "poe-harvest-crafts",
   "version": "0.0.1",
-  "description": "",
+  "description": "Tool for getting path of exile harvest informations",
   "main": "./main.prod.js",
   "scripts": {
     "electron-rebuild": "node -r ../.erb/scripts/BabelRegister.js ../.erb/scripts/ElectronRebuild.js",

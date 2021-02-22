@@ -35,11 +35,6 @@ export const BaseLayout: React.FC<Props> = ({ children }) => {
               Settings
             </Link>
           </Menu.Item>
-          <Menu.Item key='dupa' icon={<UploadOutlined />}>
-            <Link to='dupa'>
-              Settings
-            </Link>
-          </Menu.Item>
         </Menu>
       </Sider>
       <Layout className='site-layout'>

@@ -1,6 +1,8 @@
 import { BrowserWindow, ipcMain } from 'electron';
+import { overlayWindow } from 'electron-overlay-window';
 import { IPC_EVENTS } from '../../constants/ipc/events';
 import path from 'path';
+import appConfig from '../../constants/appConfig';
 
 class OverlayWindow {
   private _window?: BrowserWindow;
@@ -9,49 +11,61 @@ class OverlayWindow {
     ipcMain.on(IPC_EVENTS.SHOW_OVERLAY, () => {
       this.showOverlayWindow();
     });
+
+    ipcMain.on(IPC_EVENTS.CLOSE_OVERLAY, () => {
+      this.closeOverlayWindow();
+    });
   }
 
   get window() {
     return this._window;
   }
 
-  createOverlayWindow() {
+  get isOverlayShown(): boolean {
+    return this._window?.isVisible() ?? false;
+  }
+
+  createOverlayWindow(): boolean {
     if (this._window) {
       this._window.destroy();
     }
 
-    const window = new BrowserWindow({
-      width: 1280,
-      height: 720,
-      frame: false,
-      fullscreenable: true,
-      transparent: true,
-      skipTaskbar: true,
-      resizable: true,
-      show: false,
-      webPreferences: {
-        nodeIntegration: true,
-        enableRemoteModule: true
-      }
-    });
-    this._window = window;
+    try {
+      const window = new BrowserWindow({
+        title: 'Poe-harvest-crafts-overlay',
+        width: 300,
+        height: 400,
+        frame: false,
+        fullscreenable: true,
+        transparent: true,
+        skipTaskbar: true,
+        resizable: true,
+        show: false,
+        webPreferences: {
+          nodeIntegration: true,
+          enableRemoteModule: true
+        }
+      });
 
-    this._window.setPosition(0, 0);
-    this._window.maximize();
+      this._window = window;
 
-    const directory = path.join(__dirname, '../..');
-    console.log(directory);
+      const directory = path.join(__dirname, '../..');
+      this._window.loadURL(`file://${directory}/index.html#/overlay`);
 
-    this._window.loadURL(`file://${directory}/index.html#/overlay`);
+      this._window.on('closed', () => {
+        this._window = undefined;
+      });
 
-    this._window.once('ready-to-show', () => {
-      console.log('Showing window');
-      this._window?.show();
-    });
+      this._window.setIgnoreMouseEvents(true);
+      overlayWindow.attachTo(this._window, appConfig.poeWindowName);
 
-    this._window.on('closed', () => {
-      this._window = undefined;
-    });
+      return true;
+    } catch (e) {
+      this.closeOverlayWindow();
+      console.error(`Error when creating overlay window.`, e);
+
+      return false;
+    }
   }
 
   public showOverlayWindow() {
@@ -59,15 +73,20 @@ class OverlayWindow {
       this.createOverlayWindow();
     }
 
-    this._window?.show();
-    this._window?.focus();
+    if (this._window) {
+      overlayWindow.show();
+    }
   }
 
   public closeOverlayWindow() {
+    overlayWindow.hide();
+
     if (this._window) {
       this._window.destroy();
+      this._window = undefined;
+      overlayWindow.stop();
     }
   }
 }
 
-export const overlayWindow = new OverlayWindow();
+export const overlay = new OverlayWindow();
