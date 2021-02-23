@@ -16,7 +16,8 @@ export const BaseLayout: React.FC<Props> = ({ children }) => {
 
   return (
     <Layout style={{
-      minHeight: '100vh'
+      minHeight: '100vh',
+      background: '#000'
     }}>
       <Sider
         collapsible

@@ -6,7 +6,7 @@ import { ROUTES } from './constants/routes';
 import { Error404 } from './components/error404';
 import { Settings } from './components/Settings';
 import { Hello } from './components/Hello';
-import { Overlay } from './components/Overlay';
+import { OverlayContainer } from './components/overlay';
 
 export default function App() {
   return (
@@ -22,7 +22,7 @@ export default function App() {
           </BaseLayout>
         </Route>
 
-        <Route path={ROUTES.OVERLAY} component={Overlay} />
+        <Route path={ROUTES.OVERLAY} component={OverlayContainer} />
       </Switch>
     </HashRouter>
   );

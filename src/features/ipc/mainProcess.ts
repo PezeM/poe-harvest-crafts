@@ -42,6 +42,12 @@ class MainProcess extends EventTarget {
     }
   }
 
+  sendOverlayReady(): void {
+    if (electron) {
+      electron.ipcRenderer.send(IPC_EVENTS.OVERLAY_READY);
+    }
+  }
+
   closeOverlayWindow() {
     if (electron) {
       electron.ipcRenderer.send(IPC_EVENTS.CLOSE_OVERLAY);
