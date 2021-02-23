@@ -1,5 +1,5 @@
-.overlay-container {
+.overlayContainer {
+  background: rgba(129, 139, 149, 0.2);
   width: 100vw;
   height: 100vh;
-  background: rgba(129, 139, 149, 0.2);
 }

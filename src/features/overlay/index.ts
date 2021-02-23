@@ -2,8 +2,8 @@ import { BrowserWindow, ipcMain } from 'electron';
 import { overlayWindow } from 'electron-overlay-window';
 import { IPC_EVENTS } from '../../constants/ipc/events';
 import path from 'path';
-import appConfig from '../../constants/appConfig';
 import { delay } from '../../constants/helpers';
+import { poeWindow } from '../poeWindow';
 
 class OverlayWindow {
   private _window?: BrowserWindow;
@@ -67,12 +67,13 @@ class OverlayWindow {
 
       this._window.setIgnoreMouseEvents(true);
 
+      poeWindow.on('status-changed', this.onPoeWindowStatusChange);
       const readyToShow = new Promise(r => this._window?.once('ready-to-show', r));
       const overlayReady = new Promise(r => ipcMain.once(IPC_EVENTS.OVERLAY_READY, r));
       await readyToShow;
       await overlayReady;
 
-      overlayWindow.attachTo(this._window, appConfig.poeWindowName);
+      poeWindow.attach(this._window);
 
       return true;
     } catch (e) {
@@ -84,6 +85,8 @@ class OverlayWindow {
   }
 
   public async showOverlayWindow() {
+    console.log('poeWindow.isActive', poeWindow.isActive);
+
     if (!this._window) {
       await this.createOverlayWindow();
     }
@@ -94,21 +97,28 @@ class OverlayWindow {
       overlayWindow.show();
       this._isFocused = true;
     }
+
+    poeWindow.isActive = false;
   }
 
   public closeOverlayWindow(focusTarget = true) {
-    try {
-      this._isFocused = false;
-      overlayWindow.hide();
-      if (focusTarget) overlayWindow.focusTarget();
+    this._isFocused = false;
+    overlayWindow.hide();
+    if (focusTarget) overlayWindow.focusTarget();
 
-      if (this._window) {
-        this._window.setIgnoreMouseEvents(true);
-      }
-    } catch (e) {
-
+    if (this._window) {
+      this._window.setIgnoreMouseEvents(true);
     }
+
+    poeWindow.isActive = true;
   }
+
+  private onPoeWindowStatusChange = (isActive: boolean) => {
+    if (isActive && this._isFocused) {
+      this._isFocused = false;
+      this._window?.setIgnoreMouseEvents(true);
+    }
+  };
 }
 
 export const overlay = new OverlayWindow();
