@@ -19,9 +19,6 @@ class OverlayWindow {
     ipcMain.on(IPC_EVENTS.CLOSE_OVERLAY, () => {
       this.closeOverlayWindow();
     });
-
-    this.createOverlayWindow()
-      .catch();
   }
 
   get window() {
@@ -36,7 +33,7 @@ class OverlayWindow {
     return this._isFocused;
   }
 
-  private async createOverlayWindow(): Promise<boolean> {
+  async createOverlayWindow(): Promise<boolean> {
     if (process.platform === 'linux') {
       // Fix for transparent window on linux
       await delay(1000);

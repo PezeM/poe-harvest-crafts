@@ -21,6 +21,7 @@ import { initializeConfigEvents } from './constants/config';
 import { TrayMenu } from './tray';
 import './features/overlay';
 import { initializeIpcListeners } from './features/ipc/ipcListeners';
+import { overlay } from './features/overlay';
 
 export default class AppUpdater {
   constructor() {
@@ -152,6 +153,7 @@ const createWindow = async () => {
 
   initializeConfigEvents();
   initializeIpcListeners(mainWindow);
+  await overlay.createOverlayWindow();
 };
 
 app.on('window-all-closed', () => {
