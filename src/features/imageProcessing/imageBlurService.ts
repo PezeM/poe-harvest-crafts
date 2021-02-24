@@ -1,4 +1,5 @@
 import { getARGB, setPixels } from '../../constants/helpers';
+import { ImageDimension } from '../../types/vector.interface';
 
 export class ImageBlurService {
   private _blurRadius = 0;
@@ -10,10 +11,10 @@ export class ImageBlurService {
     this.initializeProperties();
   }
 
-  blurARGB(pixels: Uint8ClampedArray, canvas: HTMLCanvasElement, radius: number) {
+  blurARGB(pixels: Uint8ClampedArray, imgDimension: ImageDimension, radius: number) {
     this.initializeProperties();
-    const width = canvas.width;
-    const height = canvas.height;
+    const width = imgDimension.width;
+    const height = imgDimension.height;
     const numPackedPixels = width * height;
     const argb = new Int32Array(numPackedPixels);
     for (let j = 0; j < numPackedPixels; j++) {

@@ -21,3 +21,5 @@ export const setPixels = (pixels: Uint8ClampedArray, data: Int32Array): void => 
     pixels[offset + 3] = (data[i] & 0xff000000) >>> 24;
   }
 };
+
+export const isDevMode = (): boolean => process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';

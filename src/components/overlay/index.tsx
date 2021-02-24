@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './style.css';
 import { mainProcess } from '../../features/ipc/mainProcess';
-import { IVector2 } from '../../types/vector.interface';
+import { ImageDimension, IVector2 } from '../../types/vector.interface';
 import { desktopCapturer, SourcesOptions } from 'electron';
 import appConfig from '../../constants/appConfig';
-import * as os from 'os';
-import path from 'path';
-import * as fs from 'fs';
+import { poeWindow } from '../../features/poeWindow';
+import { ocrManager } from '../../features/ocr';
 
 export const OverlayContainer = () => {
   const [isDragging, setIsDragging] = useState(false);
@@ -91,7 +90,7 @@ export const OverlayContainer = () => {
   async function takeScreenshot() {
     console.log('Taking screenshot');
 
-    const size = mainProcess.getScreenDimension();
+    const size = poeWindow.bounds ? poeWindow.bounds : mainProcess.getScreenDimension();
     console.log(size);
 
     const options: SourcesOptions = {
@@ -100,7 +99,7 @@ export const OverlayContainer = () => {
     };
 
     // Just in case someone clicks on canvas after mouse up
-    const imageDimension = {
+    const imageDimension: ImageDimension = {
       x: dragStartPos.x,
       y: dragStartPos.y,
       width: dragData.x,
@@ -108,32 +107,13 @@ export const OverlayContainer = () => {
     };
 
     try {
-      const start = Date.now();
       const sources = await desktopCapturer.getSources(options);
       console.log('Is poe', sources.some(s => s.name === appConfig.poeWindowName));
 
-      for (const source of sources) {
-        if (source.name !== appConfig.poeWindowName) continue;
+      const poeWindowSource = sources.find(s => s.name === appConfig.poeWindowName);
+      if (!poeWindowSource) return;
 
-        const screenshotPath = path.join(os.tmpdir(), `${source.name}.png`);
-        console.log(screenshotPath);
-
-        const croppedImage = source.thumbnail.crop({
-          height: imageDimension.height,
-          width: imageDimension.width,
-          x: imageDimension.x,
-          y: imageDimension.y
-        }).resize({
-          height: 2000,
-          width: 2000,
-          quality: 'best'
-        });
-
-        fs.writeFile(screenshotPath, croppedImage.toPNG(), err => {
-          console.log(err);
-          console.log('Saved in', Date.now() - start);
-        });
-      }
+      await ocrManager.getTextFromImage(poeWindowSource.thumbnail, imageDimension);
     } catch (e) {
       console.error('Error in capturing image', e);
     }

@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, Rectangle } from 'electron';
 import { overlayWindow } from 'electron-overlay-window';
 import appConfig from '../../constants/appConfig';
 import { EventEmitter } from 'events';
@@ -9,6 +9,7 @@ interface PoeWindow {
 
 class PoeWindow extends EventEmitter {
   private _isActive: boolean = false;
+  private _bounds?: Rectangle;
 
   get isActive(): boolean {
     return this._isActive;
@@ -22,12 +23,25 @@ class PoeWindow extends EventEmitter {
     this.emit('status-changed', this._isActive);
   }
 
+  get bounds() {
+    return this._bounds;
+  }
+
   attach(window: BrowserWindow) {
     overlayWindow.on('focus', () => {
       this.isActive = true;
     });
+
     overlayWindow.on('blur', () => {
       this.isActive = false;
+    });
+
+    overlayWindow.on('attach', e => {
+      this._bounds = e;
+    });
+
+    overlayWindow.on('moveresize', e => {
+      this._bounds = e;
     });
 
     overlayWindow.attachTo(window, appConfig.poeWindowName);
