@@ -6,6 +6,7 @@ import { desktopCapturer, SourcesOptions } from 'electron';
 import appConfig from '../../constants/appConfig';
 import * as os from 'os';
 import path from 'path';
+import * as fs from 'fs';
 
 export const OverlayContainer = () => {
   const [isDragging, setIsDragging] = useState(false);
@@ -99,7 +100,7 @@ export const OverlayContainer = () => {
     };
 
     // Just in case someone clicks on canvas after mouse up
-    const imageDimensions = {
+    const imageDimension = {
       x: dragStartPos.x,
       y: dragStartPos.y,
       width: dragData.x,
@@ -107,19 +108,31 @@ export const OverlayContainer = () => {
     };
 
     try {
+      const start = Date.now();
       const sources = await desktopCapturer.getSources(options);
-      for (const source of sources) {
-        console.log(source);
+      console.log('Is poe', sources.some(s => s.name === appConfig.poeWindowName));
 
+      for (const source of sources) {
         if (source.name !== appConfig.poeWindowName) continue;
 
         const screenshotPath = path.join(os.tmpdir(), `${source.name}.png`);
         console.log(screenshotPath);
 
-        // fs.writeFile(screenshotPath, source.thumbnail.toPNG(), err => {
-        //   console.log(err);
-        //   console.log('Saved file');
-        // });
+        const croppedImage = source.thumbnail.crop({
+          height: imageDimension.height,
+          width: imageDimension.width,
+          x: imageDimension.x,
+          y: imageDimension.y
+        }).resize({
+          height: 2000,
+          width: 2000,
+          quality: 'best'
+        });
+
+        fs.writeFile(screenshotPath, croppedImage.toPNG(), err => {
+          console.log(err);
+          console.log('Saved in', Date.now() - start);
+        });
       }
     } catch (e) {
       console.error('Error in capturing image', e);

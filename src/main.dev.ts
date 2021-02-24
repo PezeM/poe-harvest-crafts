@@ -22,6 +22,7 @@ import { TrayMenu } from './tray';
 import './features/overlay';
 import { initializeIpcListeners } from './features/ipc/ipcListeners';
 import { overlay } from './features/overlay';
+import './features/ocr';
 
 export default class AppUpdater {
   constructor() {

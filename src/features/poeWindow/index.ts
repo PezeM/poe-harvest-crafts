@@ -17,8 +17,8 @@ class PoeWindow extends EventEmitter {
   set isActive(value: boolean) {
     if (this._isActive === value) return;
 
-    console.log('poeWindowIsActiveChanged', this._isActive);
     this._isActive = value;
+    console.log('poeWindowIsActiveChanged', this._isActive);
     this.emit('status-changed', this._isActive);
   }
 
