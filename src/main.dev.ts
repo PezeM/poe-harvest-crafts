@@ -94,8 +94,8 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     title: 'Poe-harvest-crafts',
-    width: 1280,
-    height: 720,
+    width: 800,
+    height: 450,
     x: mainWindowState.x,
     y: mainWindowState.y,
     icon: getAssetPath('icon.png'),

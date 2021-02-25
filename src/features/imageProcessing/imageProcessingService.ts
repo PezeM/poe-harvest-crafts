@@ -1,5 +1,13 @@
 import { ImageBlurService } from './imageBlurService';
 import { getARGB, setPixels } from '../../constants/helpers';
+import { NativeImage } from 'electron';
+import { ImageDimension, IRectangle } from '../../types/vector.interface';
+import { IProcessingImageOptions } from '../../types/imageProcessing.interface';
+
+const defaultProcessingOptions: IProcessingImageOptions = {
+  thresholdLevel: 1,
+  radius: 0.2
+};
 
 export class ImageProcessingService {
   private _imageBlurService: ImageBlurService;
@@ -8,14 +16,13 @@ export class ImageProcessingService {
     this._imageBlurService = new ImageBlurService();
   }
 
-  processImage(canvas: HTMLCanvasElement, thresholdLevel = 1, radius = 0.2): any {
-    const processedImageData = canvas.getContext('2d')?.getImageData(0, 0, canvas.width, canvas.height);
-    if (!processedImageData) return;
-    this._imageBlurService.blurARGB(processedImageData.data, canvas, radius);
-    this.dilate(processedImageData.data, canvas);
-    this.invertColors(processedImageData.data);
-    this.thresholdFilter(processedImageData.data, thresholdLevel);
-    return processedImageData;
+  processImage(imageData: ImageData, imageDimension: IRectangle, opt?: Partial<IProcessingImageOptions>): ImageData {
+    const options = { ...defaultProcessingOptions, ...opt };
+    // this._imageBlurService.blurARGB(imageData.data, imageDimension, options.radius);
+    // this.dilate(imageData.data, imageDimension);
+    // this.invertColors(imageData.data);
+    // this.thresholdFilter(imageData.data, options.thresholdLevel);
+    return imageData;
   }
 
   thresholdFilter(pixels: Uint8ClampedArray, level: number): void {
@@ -44,7 +51,7 @@ export class ImageProcessingService {
   }
 
   // from https://github.com/processing/p5.js/blob/main/src/image/filters.js
-  dilate(pixels: Uint8ClampedArray, canvas: HTMLCanvasElement): void {
+  dilate(pixels: Uint8ClampedArray, imageDimension: IRectangle): void {
     let currIdx = 0;
     const maxIdx = pixels.length ? pixels.length / 4 : 0;
     const out = new Int32Array(maxIdx);
@@ -56,13 +63,13 @@ export class ImageProcessingService {
 
     while (currIdx < maxIdx) {
       currRowIdx = currIdx;
-      maxRowIdx = currIdx + canvas.width;
+      maxRowIdx = currIdx + imageDimension.width;
       while (currIdx < maxRowIdx) {
         colOrig = colOut = getARGB(pixels, currIdx);
         idxLeft = currIdx - 1;
         idxRight = currIdx + 1;
-        idxUp = currIdx - canvas.width;
-        idxDown = currIdx + canvas.width;
+        idxUp = currIdx - imageDimension.width;
+        idxDown = currIdx + imageDimension.width;
 
         if (idxLeft < currRowIdx) {
           idxLeft = currIdx;
@@ -109,5 +116,19 @@ export class ImageProcessingService {
     }
 
     setPixels(pixels, out);
+  }
+
+  cropAndResizeImg(img: NativeImage, imageDimension: ImageDimension, quality = 'best') {
+    return img.crop({
+      height: imageDimension.height,
+      width: imageDimension.width,
+      x: imageDimension.x,
+      y: imageDimension.y
+    });
+    // }).resize({
+    //   height: 2000, // TODO: Read it from user settings
+    //   width: 2000,
+    //   quality
+    // });
   }
 }

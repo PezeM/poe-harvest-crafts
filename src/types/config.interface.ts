@@ -1,6 +1,8 @@
 export interface AppConfig {
   poeWindowName: string;
   dataFolderName: string;
+  minOcrWidth: number;
+  minOcrHeight: number;
 }
 
 export interface Config {

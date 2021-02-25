@@ -10,6 +10,11 @@ interface PoeWindow {
 class PoeWindow extends EventEmitter {
   private _isActive: boolean = false;
 
+  constructor() {
+    super();
+    overlayWindow.defaultBehavior = true;
+  }
+
   get isActive(): boolean {
     return this._isActive;
   }
@@ -26,6 +31,7 @@ class PoeWindow extends EventEmitter {
     overlayWindow.on('focus', () => {
       this.isActive = true;
     });
+
     overlayWindow.on('blur', () => {
       this.isActive = false;
     });

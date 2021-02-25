@@ -27,4 +27,14 @@ export class OcrWorker {
   public async isWorkerReady(): Promise<boolean> {
     return await this._workerReady;
   }
+
+  public async recognize(imageSource: string) {
+    await this.isWorkerReady();
+    const {
+      data,
+      data: { text }
+    } = await this._worker.recognize(imageSource);
+
+    console.log(text);
+  }
 }

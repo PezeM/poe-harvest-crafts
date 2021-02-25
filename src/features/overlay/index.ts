@@ -92,9 +92,9 @@ class OverlayWindow {
     }
 
     if (this._window) {
-      this._window.setIgnoreMouseEvents(false);
       this._window.show();
       overlayWindow.show();
+      this._window.setIgnoreMouseEvents(false);
       this._isFocused = true;
     }
 

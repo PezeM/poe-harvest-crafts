@@ -1,12 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './style.css';
 import { mainProcess } from '../../features/ipc/mainProcess';
-import { IVector2 } from '../../types/vector.interface';
+import { ImageDimension, IVector2 } from '../../types/vector.interface';
 import { desktopCapturer, SourcesOptions } from 'electron';
 import appConfig from '../../constants/appConfig';
-import * as os from 'os';
-import path from 'path';
-import * as fs from 'fs';
+import { ocrManager } from '../../features/ocr';
 
 export const OverlayContainer = () => {
   const [isDragging, setIsDragging] = useState(false);
@@ -54,6 +52,12 @@ export const OverlayContainer = () => {
     if (!ctx) return;
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
+    // Return when selected area is small
+    if (Math.abs(dragData.x) < appConfig.minOcrWidth || Math.abs(dragData.y) < appConfig.minOcrHeight) {
+      console.warn(`Width / height of selected area is too small. height: ${Math.abs(dragData.y)} width: ${Math.abs(dragData.x)}`);
+      return;
+    }
+
     await takeScreenshot();
   }
 
@@ -67,6 +71,7 @@ export const OverlayContainer = () => {
     // Calculate width/height based on current mouse pos vs starting mouse pos
     const width = x - dragStartPos.x;
     const height = y - dragStartPos.y;
+
     setDragData({
       x: width,
       y: height
@@ -100,7 +105,7 @@ export const OverlayContainer = () => {
     };
 
     // Just in case someone clicks on canvas after mouse up
-    const imageDimension = {
+    const imageDimension: ImageDimension = {
       x: dragStartPos.x,
       y: dragStartPos.y,
       width: dragData.x,
@@ -108,32 +113,13 @@ export const OverlayContainer = () => {
     };
 
     try {
-      const start = Date.now();
       const sources = await desktopCapturer.getSources(options);
       console.log('Is poe', sources.some(s => s.name === appConfig.poeWindowName));
 
-      for (const source of sources) {
-        if (source.name !== appConfig.poeWindowName) continue;
+      const poeWindowSource = sources.find(s => s.name === appConfig.poeWindowName);
+      if (!poeWindowSource) return;
 
-        const screenshotPath = path.join(os.tmpdir(), `${source.name}.png`);
-        console.log(screenshotPath);
-
-        const croppedImage = source.thumbnail.crop({
-          height: imageDimension.height,
-          width: imageDimension.width,
-          x: imageDimension.x,
-          y: imageDimension.y
-        }).resize({
-          height: 2000,
-          width: 2000,
-          quality: 'best'
-        });
-
-        fs.writeFile(screenshotPath, croppedImage.toPNG(), err => {
-          console.log(err);
-          console.log('Saved in', Date.now() - start);
-        });
-      }
+      await ocrManager.getTextFromImage(poeWindowSource.thumbnail, imageDimension);
     } catch (e) {
       console.error('Error in capturing image', e);
     }
