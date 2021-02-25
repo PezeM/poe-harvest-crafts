@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styles from './style.css';
 import { mainProcess } from '../../features/ipc/mainProcess';
 import { ImageDimension, IVector2 } from '../../types/vector.interface';
@@ -17,7 +17,6 @@ export const OverlayContainer = () => {
   useEffect(() => {
     if (canvasRef.current) {
       const canvasEle = canvasRef.current;
-      console.log(canvasEle);
 
       canvasEle.width = canvasEle.clientWidth;
       canvasEle.height = canvasEle.clientHeight;
@@ -25,6 +24,21 @@ export const OverlayContainer = () => {
 
     // Sends event that overlay is rendered and can be shown
     mainProcess.sendOverlayReady();
+  }, []);
+
+  useLayoutEffect(() => {
+    function updateCanvasSize() {
+      if (canvasRef.current) {
+        const canvasEle = canvasRef.current;
+
+        canvasEle.width = canvasEle.clientWidth;
+        canvasEle.height = canvasEle.clientHeight;
+      }
+    }
+
+    window.addEventListener('resize', updateCanvasSize);
+
+    return () => window.removeEventListener('resize', updateCanvasSize);
   }, []);
 
   function onMouseDown(e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) {
@@ -55,6 +69,7 @@ export const OverlayContainer = () => {
     // Return when selected area is small
     if (Math.abs(dragData.x) < appConfig.minOcrWidth || Math.abs(dragData.y) < appConfig.minOcrHeight) {
       console.warn(`Width / height of selected area is too small. height: ${Math.abs(dragData.y)} width: ${Math.abs(dragData.x)}`);
+      setDragData({ x: 0, y: 0 });
       return;
     }
 
@@ -96,7 +111,10 @@ export const OverlayContainer = () => {
   async function takeScreenshot() {
     console.log('Taking screenshot');
 
-    const size = mainProcess.getScreenDimension();
+    const size = canvasRef.current ? {
+      height: canvasRef.current.height,
+      width: canvasRef.current.width
+    } : mainProcess.getScreenDimension();
     console.log(size);
 
     const options: SourcesOptions = {

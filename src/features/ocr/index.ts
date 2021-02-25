@@ -27,8 +27,8 @@ class OcrManager {
     console.log(screenshotPath);
     console.log(imageDimension);
 
-    // const croppedImage = this._imageProcessingService.cropAndResizeImg(img, imageDimension);
-    const croppedImage = img;
+    const croppedImage = this._imageProcessingService.cropAndResizeImg(img, imageDimension);
+    // const croppedImage = img;
     const croppedImageSize = croppedImage.getSize();
 
     const canvas = document.createElement('canvas');

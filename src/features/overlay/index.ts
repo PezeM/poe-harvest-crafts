@@ -42,31 +42,27 @@ class OverlayWindow {
     try {
       const window = new BrowserWindow({
         title: 'Poe-harvest-crafts-overlay',
-        width: 300,
-        height: 400,
-        frame: false,
-        fullscreenable: true,
-        transparent: true,
-        skipTaskbar: true,
-        resizable: true,
-        show: false,
+        width: 800,
+        height: 600,
+        ...overlayWindow.WINDOW_OPTS,
         webPreferences: {
           nodeIntegration: true,
-          enableRemoteModule: true
+          enableRemoteModule: true,
+          webSecurity: false
         }
       });
 
       this._window = window;
 
-      const directory = path.join(__dirname, '../..');
-      await this._window.loadURL(`file://${directory}/index.html#/overlay`);
+      this._window.setIgnoreMouseEvents(true);
+      this._window.webContents.on('before-input-event', this.onBeforeInput);
 
       this._window.on('closed', () => {
         this._window = undefined;
       });
 
-      this._window.setIgnoreMouseEvents(true);
-      this._window.webContents.on('before-input-event', this.onBeforeInput);
+      const directory = path.join(__dirname, '../..');
+      await this._window.loadURL(`file://${directory}/index.html#/overlay`);
 
       poeWindow.on('status-changed', this.onPoeWindowStatusChange);
       const readyToShow = new Promise(r => this._window?.once('ready-to-show', r));
@@ -75,7 +71,6 @@ class OverlayWindow {
       await overlayReady;
 
       poeWindow.attach(this._window);
-
       return true;
     } catch (e) {
       this.closeOverlayWindow();
@@ -92,26 +87,44 @@ class OverlayWindow {
       await this.createOverlayWindow();
     }
 
+    // if (this._window) {
+    //   this._window.show();
+    //   overlayWindow.show();
+    //   this._window.setIgnoreMouseEvents(false);
+    //   this._isFocused = true;
+    // }
+    //
+    // poeWindow.isActive = false;
+
+    this._isFocused = true;
     if (this._window) {
-      this._window.show();
-      overlayWindow.show();
       this._window.setIgnoreMouseEvents(false);
-      this._isFocused = true;
+      this._window.show();
+      overlayWindow.activateOverlay();
     }
 
     poeWindow.isActive = false;
   }
 
   public closeOverlayWindow(focusTarget = true) {
+    // this._isFocused = false;
+    // this._window?.hide();
+    // overlayWindow.hide();
+    // if (focusTarget) overlayWindow.focusTarget();
+    //
+    // if (this._window) {
+    //   this._window.setIgnoreMouseEvents(true);
+    // }
+    //
+    // poeWindow.isActive = true;
     this._isFocused = false;
-    this._window?.hide();
-    overlayWindow.hide();
-    if (focusTarget) overlayWindow.focusTarget();
 
     if (this._window) {
+      this._window.hide();
       this._window.setIgnoreMouseEvents(true);
     }
 
+    if (focusTarget) overlayWindow.focusTarget();
     poeWindow.isActive = true;
   }
 
