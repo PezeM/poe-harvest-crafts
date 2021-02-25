@@ -31,7 +31,6 @@ export class OcrWorker {
   public async recognize(imageSource: string) {
     await this.isWorkerReady();
     const {
-      data,
       data: { text }
     } = await this._worker.recognize(imageSource);
 

@@ -66,6 +66,7 @@ class OverlayWindow {
       });
 
       this._window.setIgnoreMouseEvents(true);
+      this._window.webContents.on('before-input-event', this.onBeforeInput);
 
       poeWindow.on('status-changed', this.onPoeWindowStatusChange);
       const readyToShow = new Promise(r => this._window?.once('ready-to-show', r));
@@ -103,6 +104,7 @@ class OverlayWindow {
 
   public closeOverlayWindow(focusTarget = true) {
     this._isFocused = false;
+    this._window?.hide();
     overlayWindow.hide();
     if (focusTarget) overlayWindow.focusTarget();
 
@@ -117,6 +119,36 @@ class OverlayWindow {
     if (isActive && this._isFocused) {
       this._isFocused = false;
       this._window?.setIgnoreMouseEvents(true);
+    }
+  };
+
+  private onBeforeInput = (event: Electron.Event, input: Electron.Input) => {
+    if (input.type !== 'keyDown' || !this._isFocused) return;
+
+    console.log(input);
+
+    let { code, control, shift, alt } = input;
+
+    if (code.startsWith('Key')) {
+      code = code.substr('Key'.length);
+    } else if (code.startsWith('Digit')) {
+      code = code.substr('Digit'.length);
+    }
+
+    if (alt && shift) code = `Shift + Alt + ${code}`;
+    if (alt && control) code = `Ctrl + Alt + ${code}`;
+    if (control && shift) code = `Ctrl + Shift + ${code}`;
+    if (alt) code = `Alt + ${code}`;
+    if (control) code = `Ctrl + ${code}`;
+    if (shift) code = `Shift + ${code}`;
+
+    switch (code) {
+      case 'Escape':
+      case 'Ctrl + W': {
+        event.preventDefault();
+        process.nextTick(this.closeOverlayWindow.bind(this));
+        break;
+      }
     }
   };
 }
