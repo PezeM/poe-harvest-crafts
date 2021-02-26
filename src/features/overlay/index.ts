@@ -45,6 +45,7 @@ class OverlayWindow {
         width: 800,
         height: 600,
         ...overlayWindow.WINDOW_OPTS,
+        show: false,
         webPreferences: {
           nodeIntegration: true,
           enableRemoteModule: true,
@@ -62,7 +63,7 @@ class OverlayWindow {
       });
 
       const directory = path.join(__dirname, '../..');
-      await this._window.loadURL(`file://${directory}/index.html#/overlay`);
+      this._window.loadURL(`file://${directory}/index.html#/overlay`);
 
       poeWindow.on('status-changed', this.onPoeWindowStatusChange);
       const readyToShow = new Promise(r => this._window?.once('ready-to-show', r));

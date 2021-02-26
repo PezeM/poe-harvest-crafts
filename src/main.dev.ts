@@ -23,6 +23,7 @@ import './features/overlay';
 import { initializeIpcListeners } from './features/ipc/ipcListeners';
 import { overlay } from './features/overlay';
 import './features/ocr';
+import { shortcutsManager } from './features/shortcuts';
 
 export default class AppUpdater {
   constructor() {
@@ -155,6 +156,7 @@ const createWindow = async () => {
   initializeConfigEvents();
   initializeIpcListeners(mainWindow);
   await overlay.createOverlayWindow();
+  shortcutsManager.initializeShortcuts();
 };
 
 app.on('window-all-closed', () => {
@@ -171,4 +173,8 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) createWindow();
+});
+
+app.on('quit', () => {
+  shortcutsManager.unregisterShortcuts();
 });
