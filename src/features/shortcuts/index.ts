@@ -7,13 +7,6 @@ import { overlay } from '../overlay';
 class ShortcutsManager {
   private _initialized: boolean = false;
 
-  static toElectronShortcut(shortcut: string) {
-    return shortcut
-      .split(' + ')
-      // .map(k => KeyToElectron[k as keyof typeof KeyToElectron])
-      .join('+');
-  }
-
   public initializeShortcuts() {
     if (this._initialized) return;
 
