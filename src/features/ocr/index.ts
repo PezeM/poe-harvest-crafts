@@ -22,28 +22,22 @@ class OcrManager {
   }
 
   async getTextFromImage(img: NativeImage, imageDimension: ImageDimension) {
-    console.log('1');
     const screenshotPath = path.join(os.tmpdir(), `pathOfExile.png`);
-    console.log(screenshotPath);
     console.log(imageDimension);
 
     const croppedImage = this._imageProcessingService.cropAndResizeImg(img, imageDimension);
-    // const croppedImage = img;
     const croppedImageSize = croppedImage.getSize();
+    console.log(croppedImageSize);
 
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     canvas.width = croppedImageSize.width;
     canvas.height = croppedImageSize.height;
 
-    console.log('loaded');
-
-    console.log('1.5');
-
     const bitmap = croppedImage.toBitmap();
     const pixelArray = removeBlueTint(bitmap);
 
-    const imageData = new ImageData(new Uint8ClampedArray(pixelArray), croppedImageSize.width, croppedImageSize.height);
+    const imageData = new ImageData(new Uint8ClampedArray(pixelArray), Math.abs(croppedImageSize.width), Math.abs(croppedImageSize.height));
     const processedImageData = this._imageProcessingService.processImage(imageData, croppedImageSize);
 
     // ctx.drawImage(canvasImage, 0, 0);

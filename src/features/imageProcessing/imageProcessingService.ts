@@ -119,9 +119,12 @@ export class ImageProcessingService {
   }
 
   cropAndResizeImg(img: NativeImage, imageDimension: ImageDimension, quality = 'best') {
+    if (imageDimension.height < 0) imageDimension.y += imageDimension.height;
+    if (imageDimension.width < 0) imageDimension.x += imageDimension.width;
+
     return img.crop({
-      height: imageDimension.height,
-      width: imageDimension.width,
+      height: Math.abs(imageDimension.height),
+      width: Math.abs(imageDimension.width),
       x: imageDimension.x,
       y: imageDimension.y
     });
