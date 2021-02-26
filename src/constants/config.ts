@@ -5,7 +5,7 @@ import { IPC_EVENTS } from './ipc/events';
 import appConfig from './appConfig';
 
 export const defaultConfig: Config = {
-  openOcr: 'CmdOrCtrl+F5',
+  openOcrKey: 'Ctrl + F5',
   logLevel: '2',
   leagueId: 'Ritual',
   language: 'en'

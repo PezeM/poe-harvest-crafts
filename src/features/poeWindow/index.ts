@@ -54,6 +54,10 @@ class PoeWindow extends EventEmitter {
       console.log('Attached');
       this._isAttached = true;
       this._bounds = e;
+
+      // TODO: Temporary fix for not showing overlay on attach
+      // Either change the library default behaviour or hide the overlay html by css
+      window?.hide();
     });
 
     overlayWindow.on('detach', () => {

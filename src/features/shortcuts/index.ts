@@ -35,7 +35,7 @@ class ShortcutsManager {
 
   private registerShortcuts() {
     const shortcuts: Shortcut<Function>[] = [
-      new Shortcut(config.get('openOcr'), () => overlay.showOverlayWindow())
+      new Shortcut(config.get('openOcrKey'), () => overlay.showOverlayWindow())
     ];
 
     for (const shortcut of shortcuts) {

@@ -6,7 +6,7 @@ export interface AppConfig {
 }
 
 export interface Config {
-  openOcr: string;
+  openOcrKey: string;
   leagueId?: string;
   clientLog?: string;
   logLevel: string;
