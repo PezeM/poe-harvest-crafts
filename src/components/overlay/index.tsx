@@ -24,7 +24,6 @@ export const OverlayContainer = () => {
 
     // Sends event that overlay is rendered and can be shown
     mainProcess.sendOverlayReady();
-    document.title = 'Eluwaaa';
   }, []);
 
   useLayoutEffect(() => {
