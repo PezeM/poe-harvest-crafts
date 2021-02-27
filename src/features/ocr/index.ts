@@ -3,14 +3,10 @@ import { OcrWorker } from './ocrWorker';
 import { nativeImage, NativeImage } from 'electron';
 import { ImageDimension } from '../../types/vector.interface';
 import { isDevMode, removeBlueTint } from '../../constants/helpers';
+import { OcrProgressAction } from '../../types/overlay.interface';
 import path from 'path';
 import * as os from 'os';
 import * as fs from 'fs';
-
-function toBase64(arr: Buffer) {
-  //arr = new Uint8Array(arr) if it's an ArrayBuffer
-  return btoa(arr.reduce((data, byte) => data + String.fromCharCode(byte), ''));
-}
 
 class OcrManager {
   private readonly _imageProcessingService: ImageProcessingService;
@@ -21,40 +17,46 @@ class OcrManager {
     this._ocrWorker = new OcrWorker();
   }
 
-  async getTextFromImage(img: NativeImage, imageDimension: ImageDimension) {
-    const screenshotPath = path.join(os.tmpdir(), `pathOfExile.png`);
-    console.log(imageDimension);
+  async getTextFromImage(img: NativeImage, imageDimension: ImageDimension, updateProgress?: (progress: OcrProgressAction) => void) {
+    try {
+      updateProgress?.({ progressText: 'Processing image', active: true });
+      const screenshotPath = path.join(os.tmpdir(), `pathOfExile.png`);
 
-    const croppedImage = this._imageProcessingService.cropAndResizeImg(img, imageDimension);
-    const croppedImageSize = croppedImage.getSize();
-    console.log(croppedImageSize);
+      const croppedImage = this._imageProcessingService.cropAndResizeImg(img, imageDimension);
+      const croppedImageSize = croppedImage.getSize();
+      console.log(croppedImageSize);
 
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-    canvas.width = croppedImageSize.width;
-    canvas.height = croppedImageSize.height;
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+      canvas.width = croppedImageSize.width;
+      canvas.height = croppedImageSize.height;
 
-    const bitmap = croppedImage.toBitmap();
-    const pixelArray = removeBlueTint(bitmap);
+      const bitmap = croppedImage.toBitmap();
+      const pixelArray = removeBlueTint(bitmap);
 
-    const imageData = new ImageData(new Uint8ClampedArray(pixelArray), Math.abs(croppedImageSize.width), Math.abs(croppedImageSize.height));
-    const processedImageData = this._imageProcessingService.processImage(imageData, croppedImageSize);
+      const imageData = new ImageData(new Uint8ClampedArray(pixelArray), Math.abs(croppedImageSize.width), Math.abs(croppedImageSize.height));
+      const processedImageData = this._imageProcessingService.processImage(imageData, croppedImageSize);
 
-    // ctx.drawImage(canvasImage, 0, 0);
-    ctx.putImageData(processedImageData, 0, 0);
-    console.log('3');
+      // ctx.drawImage(canvasImage, 0, 0);
+      ctx.putImageData(processedImageData, 0, 0);
+      console.log('3');
 
-    const imageSource = canvas.toDataURL('image/png');
-    // await this._ocrWorker.recognize(imageSource);
+      const imageSource = canvas.toDataURL('image/png');
+      updateProgress?.({ progressText: 'Reading data from image', active: true });
+      const ocrText = await this._ocrWorker.recognize(imageSource);
 
-    console.log('isDevMode', isDevMode());
+      if (isDevMode()) {
+        const imageBuffer = nativeImage.createFromDataURL(imageSource).toPNG();
 
-    if (isDevMode()) {
-      const imageBuffer = nativeImage.createFromDataURL(imageSource).toPNG();
+        await fs.writeFile(screenshotPath, imageBuffer, (err => {
+          console.log('Saving file', err);
+        }));
+      }
 
-      await fs.writeFile(screenshotPath, imageBuffer, (err => {
-        console.log('Saving file', err);
-      }));
+      updateProgress?.({ progressText: ocrText, active: false });
+    } catch (e) {
+      updateProgress?.({ progressText: 'Error occured while processing image', active: false });
+      console.error(`Error while getting text from image`, e);
     }
   }
 }

@@ -13,6 +13,12 @@ try {
 class MainProcess extends EventTarget {
   constructor() {
     super();
+
+    if (!electron) return;
+
+    electron.ipcRenderer.on(IPC_EVENTS.OCR_PROGRESS, (_e, data) => {
+      this.dispatchEvent(new CustomEvent(IPC_EVENTS.OCR_PROGRESS, data));
+    });
   }
 
   get isElectron() {

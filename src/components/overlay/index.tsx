@@ -5,11 +5,15 @@ import { ImageDimension, IVector2 } from '../../types/vector.interface';
 import { desktopCapturer, SourcesOptions } from 'electron';
 import appConfig from '../../constants/appConfig';
 import { ocrManager } from '../../features/ocr';
+import { OcrProgressAction } from '../../types/overlay.interface';
+import Title from 'antd/es/typography/Title';
+import { IPC_EVENTS } from '../../constants/ipc/events';
 
 export const OverlayContainer = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartPos, setDragStartPos] = useState<IVector2>({ x: 0, y: 0 });
   const [dragData, setDragData] = useState<IVector2>({ x: 0, y: 0 });
+  const [actionData, setActionData] = useState<OcrProgressAction>({ progressText: 'SS', active: false });
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -36,12 +40,22 @@ export const OverlayContainer = () => {
       }
     }
 
-    window.addEventListener('resize', updateCanvasSize);
+    function onOcrProgressChange(data: any) {
+      console.log(data);
+    }
 
-    return () => window.removeEventListener('resize', updateCanvasSize);
+    window.addEventListener('resize', updateCanvasSize);
+    mainProcess.addEventListener(IPC_EVENTS.OCR_PROGRESS, onOcrProgressChange);
+
+    return () => {
+      window.removeEventListener('resize', updateCanvasSize);
+      mainProcess.removeEventListener(IPC_EVENTS.OCR_PROGRESS, onOcrProgressChange);
+    };
   }, []);
 
   function onMouseDown(e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) {
+    if (!canvasRef.current || actionData.active) return;
+
     setIsDragging(true);
 
     // Save starting x/y coords
@@ -51,13 +65,12 @@ export const OverlayContainer = () => {
     setDragData({ x: 0, y: 0 });
     console.log(x, y);
 
-    if (canvasRef.current) {
-      canvasRef.current.style.cursor = 'crosshair';
-    }
+    canvasRef.current.style.cursor = 'crosshair';
   }
 
   async function onMouseUp() {
     setIsDragging(false);
+    if (actionData.active) return;
 
     console.log('onMouseUp', dragData);
 
@@ -70,6 +83,7 @@ export const OverlayContainer = () => {
 
     // Return when selected area is small
     if (Math.abs(dragData.x) < appConfig.minOcrWidth || Math.abs(dragData.y) < appConfig.minOcrHeight) {
+      setActionData({ progressText: 'Selected area is too small.', active: false });
       console.warn(`Width / height of selected area is too small. height: ${Math.abs(dragData.y)} width: ${Math.abs(dragData.x)}`);
       setDragData({ x: 0, y: 0 });
       return;
@@ -79,7 +93,7 @@ export const OverlayContainer = () => {
   }
 
   function onMouseMove(e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) {
-    if (!isDragging || !canvasRef.current) return;
+    if (!isDragging || !canvasRef.current || actionData.active) return;
 
     // Get current mouse position
     const x = e.nativeEvent.offsetX - canvasRef.current.clientLeft;
@@ -111,7 +125,7 @@ export const OverlayContainer = () => {
   }
 
   async function takeScreenshot() {
-    console.log('Taking screenshot');
+    setActionData({ progressText: 'Taking screenshot', active: true });
 
     const size = canvasRef.current ? {
       height: canvasRef.current.height,
@@ -137,11 +151,15 @@ export const OverlayContainer = () => {
       console.log('Is poe', sources.some(s => s.name === appConfig.poeWindowName));
 
       const poeWindowSource = sources.find(s => s.name === appConfig.poeWindowName);
-      if (!poeWindowSource) return;
+      if (!poeWindowSource) {
+        setActionData({ progressText: 'PoE window not found', active: false });
+        return;
+      }
 
-      await ocrManager.getTextFromImage(poeWindowSource.thumbnail, imageDimension);
+      await ocrManager.getTextFromImage(poeWindowSource.thumbnail, imageDimension, data => setActionData(data));
     } catch (e) {
       console.error('Error in capturing image', e);
+      setActionData({ progressText: 'Error capturing image', active: false });
     }
   }
 
@@ -152,6 +170,13 @@ export const OverlayContainer = () => {
               onMouseDown={onMouseDown}
               onMouseUp={onMouseUp}
               onMouseMove={onMouseMove} />
+      {actionData.progressText &&
+      <div className={styles.progressContainer}>
+        <Title level={1} style={{ margin: 0, userSelect: 'none' }}>
+          {actionData.progressText}
+        </Title>
+      </div>
+      }
     </div>
   );
 };

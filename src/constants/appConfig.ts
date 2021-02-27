@@ -6,7 +6,7 @@ const defaultConfig: AppConfig = {
   poeWindowName: 'Path of Exile',
   dataFolderName: 'phc-data',
   minOcrHeight: 50,
-  minOcrWidth: 50
+  minOcrWidth: 100
 };
 
 const config = process.env.NODE_ENV === 'production' ? productionConfig : devConfig;

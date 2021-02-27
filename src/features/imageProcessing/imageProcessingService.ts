@@ -5,7 +5,7 @@ import { ImageDimension, IRectangle } from '../../types/vector.interface';
 import { IProcessingImageOptions } from '../../types/imageProcessing.interface';
 
 const defaultProcessingOptions: IProcessingImageOptions = {
-  thresholdLevel: 1,
+  thresholdLevel: 0.67,
   radius: 0.2
 };
 
@@ -18,10 +18,11 @@ export class ImageProcessingService {
 
   processImage(imageData: ImageData, imageDimension: IRectangle, opt?: Partial<IProcessingImageOptions>): ImageData {
     const options = { ...defaultProcessingOptions, ...opt };
-    // this._imageBlurService.blurARGB(imageData.data, imageDimension, options.radius);
-    // this.dilate(imageData.data, imageDimension);
-    // this.invertColors(imageData.data);
-    // this.thresholdFilter(imageData.data, options.thresholdLevel);
+    console.log('options', options);
+    this._imageBlurService.blurARGB(imageData.data, imageDimension, options.radius);
+    this.dilate(imageData.data, imageDimension);
+    this.invertColors(imageData.data);
+    this.thresholdFilter(imageData.data, options.thresholdLevel);
     return imageData;
   }
 
@@ -129,7 +130,7 @@ export class ImageProcessingService {
       y: imageDimension.y
     });
     // }).resize({
-    //   height: 2000, // TODO: Read it from user settings
+    //   height: 2000, // TODO: Multiply the image dimension keeping correct pixel ratio
     //   width: 2000,
     //   quality
     // });
