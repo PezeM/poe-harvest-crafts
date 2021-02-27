@@ -131,8 +131,9 @@ class OverlayWindow {
 
   private onPoeWindowStatusChange = (isActive: boolean) => {
     if (isActive && this._isFocused) {
-      this._isFocused = false;
-      this._window?.setIgnoreMouseEvents(true);
+      this.closeOverlayWindow();
+      // this._isFocused = false;
+      // this._window?.setIgnoreMouseEvents(true);
     }
   };
 

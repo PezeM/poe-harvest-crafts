@@ -24,6 +24,7 @@ export const OverlayContainer = () => {
 
     // Sends event that overlay is rendered and can be shown
     mainProcess.sendOverlayReady();
+    document.title = 'Eluwaaa';
   }, []);
 
   useLayoutEffect(() => {
@@ -48,7 +49,9 @@ export const OverlayContainer = () => {
     const x = e.nativeEvent.offsetX - (canvasRef.current?.clientLeft ?? 0);
     const y = e.nativeEvent.offsetY - (canvasRef.current?.clientTop ?? 0);
     setDragStartPos({ x, y });
+    setDragData({ x: 0, y: 0 });
     console.log(x, y);
+
     if (canvasRef.current) {
       canvasRef.current.style.cursor = 'crosshair';
     }
@@ -125,7 +128,7 @@ export const OverlayContainer = () => {
     // Just in case someone clicks on canvas after mouse up
     const imageDimension: ImageDimension = {
       x: dragStartPos.x,
-      y: dragStartPos.y,
+      y: dragStartPos.y + 15, // +15 because of app bar height
       width: dragData.x,
       height: dragData.y
     };
