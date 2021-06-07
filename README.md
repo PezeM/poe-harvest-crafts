@@ -20,4 +20,4 @@ yarn package
 
 ## License
 
-MIT © [Link](https://github.com/PezeM/poe-harvest-crafts/main/LICENSE.md)
+MIT © [Link](https://github.com/PezeM/poe-harvest-crafts/blob/main/LICENSE)
