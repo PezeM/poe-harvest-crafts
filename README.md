@@ -1,3 +1,7 @@
+# Path of Exile Harvest Crafts
+
+Electron application that uses OCR to read PoE harvest window and get harvest data. 
+
 ## Starting Development
 
 Start the app in the `dev` environment:
@@ -16,4 +20,4 @@ yarn package
 
 ## License
 
-MIT © [Electron React Boilerplate](https://github.com/electron-react-boilerplate)
+MIT © [Link](https://github.com/PezeM/poe-harvest-crafts/main/LICENSE.md)
